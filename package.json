@@ -1,6 +1,6 @@
 {
   "name": "loguno",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Log beautiful messages easily.",
   "keywords": ["log", "logger", "logging", "debug", "winston", "loglevel"],
   "bugs": "https://github.com/hankadler/js-loguno/issues",

@@ -15,9 +15,9 @@ Log beautiful messages easily.
 
   ![colors-vs-console](images/colors-vs-console.png)
 
-> Hate it? Please [tell me](https://github.com/hankadler/js-loguno/issues) why.
+:thumbsdown:? Please [tell me](https://github.com/hankadler/js-loguno/issues) why.
 
-> :heart: it? I'd relish a hot [expresso](https://www.patreon.com/user?u=80437116) :coffee:
+:heart:? I'd relish an [expresso](https://www.patreon.com/user?u=80437116) :coffee:!
 
 ## Table of Contents
 
