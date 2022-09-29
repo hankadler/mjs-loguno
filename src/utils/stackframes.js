@@ -1,5 +1,5 @@
 import path from "path";
-import { get } from "stack-trace";
+import { get } from "stack-trace-anynode";
 
 const _getFrameProps = (frame) => {
   const file = String(frame.getFileName()).replace("file://", "");
