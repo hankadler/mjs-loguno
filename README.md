@@ -63,6 +63,10 @@ Logger.logError(
 Logger.logFatal("Highest level message. Terminates the process.");
 ```
 
+- stdout
+  
+  ![stdout](images/demo-stdout.png)
+
 ### More Examples
 
 ```bash
