@@ -1,0 +1,21 @@
+# exclude
+*
+
+# include
+!docs
+!docs/**
+!examples
+!examples/**
+!images
+!images/**
+!src
+!src/**
+!test
+!test/**
+!.gitignore
+!.babelrc
+!.eslintrc.json
+!package.json
+!package-lock.json
+!README.md
+!LICENSE
