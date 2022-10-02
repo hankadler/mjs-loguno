@@ -1,17 +1,3 @@
-/**
- * @typedef {{
- *   TRACE: number,
- *   ERROR: number,
- *   INFO: number,
- *   DEBUG: number,
- *   FATAL: number,
- *   WARN: number
- * }} Level - Enum of logging levels.
- */
-
-/**
- * @enum {Level}
- */
 const LEVELS = {
   TRACE: 0,
   DEBUG: 1,

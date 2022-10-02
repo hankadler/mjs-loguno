@@ -13,12 +13,41 @@ import {
 import formatTrace from "./utils/formatTrace";
 
 /**
- * Logs information to ``outlets``.
+ * Logs information to `outlets`.
  *
- * @property {Level[]} LEVELS - Logging levels.
- * @property {Template[]} TEMPLATES - Output formats.
- * @property {OutletConfig} defaults - Options to apply to new outlets when added.
- * @property {Outlet[]} outlets - Output streams.
+ * @property {{
+ *  TRACE: number,
+ *  DEBUG: number,
+ *  INFO: number,
+ *  WARN: number,
+ *  ERROR: number,
+ *  FATAL: number,
+ * }} LEVELS
+ *
+ * @property {{
+ *   m: string,
+ *   lm: string,
+ *   lnm: string,
+ *   dlm: string,
+ *   dlnm: string,
+ * }} TEMPLATES
+ *
+ * @property {{
+ *   isExclusive: (boolean),
+ *   threshold: number,
+ *   template: string,
+ *   colors: Object
+ * }} defaults
+ *
+ * @property {{
+ *   id: string,
+ *   name: string,
+ *   file: (string|NodeJS.WriteStream),
+ *   isExclusive: (boolean),
+ *   threshold: number,
+ *   template: string,
+ *   colors: Object
+ * } []} outlets
  */
 class Logger {
   static LEVELS = { ...LEVELS }
@@ -27,13 +56,6 @@ class Logger {
 
   static defaults = { ...OUTLET_CONFIG }
 
-  /**
-   * @typedef Outlet
-   * @property {string} id - The outlet id.
-   * @property {string} name - The outlet name.
-   * @property {string | NodeJS.WriteStream} file - A file name or stream object.
-   * @mixes {OutletConfig}
-   */
   static outlets = [
     {
       _dateStart: new Date(),
@@ -41,35 +63,35 @@ class Logger {
       id: v1(),
       name: "root",
       file: process.stdout,
-      ...OUTLET_CONFIG,
       isExclusive: false,
+      threshold: OUTLET_CONFIG.threshold,
+      template: OUTLET_CONFIG.template,
+      colors: OUTLET_CONFIG.colors
     }
   ];
 
   /**
-   * Searches ``Logger.outlets`` for ``outlet`` with given ``id`` and returns it.
-   *
-   * @param {string} id - The outlet id.
-   * @returns {Outlet|any}
+   * Returns `outlet` with given `id`.
    */
   static findOutletById = (id) => this.outlets.filter((outlet) => outlet.id === id)[0]
 
   /**
-   * Adds outlet with given config.
+   * Adds `outlet` with given `config`.
    *
-   * @param {WriteStream|string} file - Outlet stream or filename.
-   * @param {OutletConfig=} config
-   * @returns {string} The outlet.id
-   * @throws {TypeError} if file type is invalid.
+   * @param {string|NodeJS.WriteStream} file
+   * @param {Object} config
+   * @param {string} config.name
+   * @param {boolean} config.isExclusive
+   * @param {number} config.threshold
+   * @param {string} config.template
+   * @param {Object} config.colors
    */
   static addOutlet(file, config = {}) {
     return this.#addOutlet(file, config);
   }
 
   /**
-   * Removes outlet.
-   *
-   * @param {string} id - The outlet id.
+   * Removes `outlet` by `id`.
    */
   static removeOutlet(id) {
     this.outlets = this.outlets.filter(({ id: _id }) => _id !== id);
@@ -85,7 +107,7 @@ class Logger {
   }
 
   /**
-   * Sends a TRACE message to outlets.
+   * Sends a TRACE message to `outlets`.
    *
    * Should be used alongside ERROR or FATAL messages.
    *
@@ -99,7 +121,7 @@ class Logger {
   }
 
   /**
-   * Sends a DEBUG message to outlets.
+   * Sends a DEBUG message to `outlets`.
    *
    * @param {string} message
    */
@@ -108,7 +130,7 @@ class Logger {
   }
 
   /**
-   * Sends a DEBUG message to outlets.
+   * Sends a DEBUG message to `outlets`.
    *
    * @param {string} message
    */
@@ -117,7 +139,7 @@ class Logger {
   }
 
   /**
-   * Sends a WARN message to outlets.
+   * Sends a WARN message to `outlets`.
    *
    * @param {string} message
    */
@@ -126,7 +148,7 @@ class Logger {
   }
 
   /**
-   * Sends an ERROR message to outlets.
+   * Sends an ERROR message to `outlets`.
    *
    * @param {string} message
    */
@@ -136,7 +158,7 @@ class Logger {
   }
 
   /**
-   * Sends a FATAL message to outlets and triggers `process.exit(1)`.
+   * Sends a FATAL message to `outlets` and triggers `process.exit(1)`.
    *
    * @param {string} message
    */
