@@ -1,3 +1,6 @@
+/**
+ * @type {string[]}
+ */
 const THRESHOLDS = [
   "TRACE",
   "DEBUG",

@@ -1,6 +1,6 @@
 import os from "os";
 import { v1 } from "uuid";
-import { DEFAULTS, FILE_TYPES, LEVELS, TEMPLATES } from "./constants";
+import { OUTLET_CONFIG, FILE_TYPES, LEVELS, TEMPLATES } from "./constants";
 import {
   appendText,
   formatDate,
@@ -13,45 +13,52 @@ import {
 import formatTrace from "./utils/formatTrace";
 
 /**
- * Logs information to outlets.
+ * Logs information to ``outlets``.
  *
- * @property {Object} defaults - The options to apply to new outlets when added.
- * @property {Object} Levels - The available logging levels.
- * @property {Array<Object>} outlets - The output streams the Logger can write to.
+ * @property {Level[]} LEVELS - Logging levels.
+ * @property {Template[]} TEMPLATES - Output formats.
+ * @property {OutletConfig} defaults - Options to apply to new outlets when added.
+ * @property {Outlet[]} outlets - Output streams.
  */
 class Logger {
-  static defaults = { ...DEFAULTS }
+  static LEVELS = { ...LEVELS }
 
-  static LEVELS = LEVELS
+  static TEMPLATES = { ...TEMPLATES }
 
-  static TEMPLATES = TEMPLATES
+  static defaults = { ...OUTLET_CONFIG }
 
+  /**
+   * @typedef Outlet
+   * @property {string} id - The outlet id.
+   * @property {string} name - The outlet name.
+   * @property {string | NodeJS.WriteStream} file - A file name or stream object.
+   * @mixes {OutletConfig}
+   */
   static outlets = [
     {
+      _dateStart: new Date(),
+      _frame: getFrame(1),
       id: v1(),
-      file: process.stdout,
-      dateStart: new Date(),
-      threshold: DEFAULTS.threshold,
-      frame: getFrame(1),
       name: "root",
-      template: DEFAULTS.template,
-      colors: DEFAULTS.colors,
-      isExclusive: false
+      file: process.stdout,
+      ...OUTLET_CONFIG,
+      isExclusive: false,
     }
-  ]
+  ];
 
+  /**
+   * Searches ``Logger.outlets`` for ``outlet`` with given ``id`` and returns it.
+   *
+   * @param {string} id - The outlet id.
+   * @returns {Outlet|any}
+   */
   static findOutletById = (id) => this.outlets.filter((outlet) => outlet.id === id)[0]
 
   /**
    * Adds outlet with given config.
    *
    * @param {WriteStream|string} file - Outlet stream or filename.
-   * @param {Object=} config
-   * @param {number|string=} config.threshold - Level message must exceed to show up.
-   * @param {string=} config.name - The outlet name; caller `moduleName` by default.
-   * @param {string=} config.template - The format template.
-   * @param {Object=} config.colors - The color options.
-   * @param {boolean=} config.isExclusive - Log only from outlet originator? Default=true
+   * @param {OutletConfig=} config
    * @returns {string} The outlet.id
    * @throws {TypeError} if file type is invalid.
    */
@@ -83,7 +90,8 @@ class Logger {
    * Should be used alongside ERROR or FATAL messages.
    *
    * @param {string=} prefix - Optional prefix to message.
-   * @param {boolean} headless - Send message only without additional information?
+   * @param {Object} options - Additional options.
+   * @param {boolean} options.headless - Send message only without additional information?
    */
   static logTrace(prefix = "", { headless = false } = {}) {
     const message = `${prefix}${headless ? "" : "\n"}${formatTrace(getStack())}\n`;
@@ -139,12 +147,12 @@ class Logger {
   }
 
   static #addOutlet(file, {
-    frame = getFrame(3),
-    threshold = DEFAULTS.threshold,
-    name = frame.module || "root",
-    template = DEFAULTS.template,
-    colors = DEFAULTS.colors,
-    isExclusive = DEFAULTS.isExclusive
+    _frame = getFrame(3),
+    name = _frame.module || "root",
+    isExclusive = OUTLET_CONFIG.isExclusive,
+    threshold = OUTLET_CONFIG.threshold,
+    template = OUTLET_CONFIG.template,
+    colors = OUTLET_CONFIG.colors
   } = {}) {
     // return existing outlet.id if outlet.name was already added
     const outletFound = this.outlets.find((outlet) => outlet.file === file);
@@ -156,25 +164,25 @@ class Logger {
     }
 
     const outlet = {
+      _dateStart: new Date(),
+      _frame,
       id: v1(),
-      dateStart: new Date(),
-      frame,
-      file,
-      threshold,
       name,
+      file,
+      isExclusive,
+      threshold,
       template,
-      colors,
-      isExclusive
+      colors
     };
 
     // init file ?
     if (typeof file === "string") {
       const text = (
-        `DATE: ${formatDate(outlet.dateStart)}\n`
+        `DATE: ${formatDate(outlet._dateStart)}\n`
         + `  OS: ${os.type()} ${os.release()}\n`
         + `USER: ${os.userInfo().username}\n`
         + ` DIR: ${process.cwd()}\n`
-        + ` SRC: ${frame.file}\n\n`
+        + ` SRC: ${_frame.file}\n\n`
       );
       initFile(file, text);
     }
@@ -191,18 +199,18 @@ class Logger {
    * @param {number} level - The message level.
    * @param {string} message - The message.
    * @param {boolean} headless - Send bare message?
-   * @param {string} caller - Becomes `name` in message. // Do not remove from signature!
+   * @param {string} _caller - Becomes `name` in message. // Do not remove from signature!
    */
-  static #log(level, message, headless = false, caller = getFrame(3).module) {
+  static #log(level, message, headless = false, _caller = getFrame(3).module) {
     const outlets = this.outlets.filter((outlet) => level >= outlet.threshold);
 
     if (!outlets.length) return;
 
-    outlets.forEach(({ frame, file, dateStart, name, template, colors, isExclusive }) => {
-      const duration = getDuration(dateStart, new Date());
+    outlets.forEach(({ _frame, file, _dateStart, name, template, colors, isExclusive }) => {
+      const duration = getDuration(_dateStart, new Date());
       const isFile = typeof file === "string";
-      if (isExclusive && frame.module !== caller) return null;
-      const fields = { duration, level, name: caller || name, message };
+      if (isExclusive && _frame.module !== _caller) return null;
+      const fields = { duration, level, name: _caller || name, message };
       if (headless) return appendText(file, message);
       const text = formatText(template, fields, colors, isFile);
       return appendText(file, text);

@@ -119,9 +119,9 @@ export NODE_NO_WARNINGS='1'
 
 Logger structure:
 
-![logger-structure](images/Logger.svg)
+![logger-structure](docs/Logger.svg)
 
-Outlet [defaults](src/constants/DEFAULTS.js)
+Outlet [defaults](src/constants/OUTLET_CONFIG.js)
 
 ## License
 
