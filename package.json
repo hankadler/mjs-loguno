@@ -1,6 +1,6 @@
 {
   "name": "loguno",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Log beautiful messages easily.",
   "keywords": [
     "log",
@@ -10,7 +10,7 @@
     "winston",
     "loglevel"
   ],
-  "bugs": "https://github.com/hankadler/js-loguno/issues",
+  "bugs": "https://github.com/hankadler/mjs-loguno/issues",
   "license": "MIT",
   "author": {
     "name": "Henry Aguila",
@@ -24,7 +24,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hankadler/js-loguno.git"
+    "url": "https://github.com/hankadler/mjs-loguno.git"
   },
   "scripts": {
     "start": "NODE_OPTIONS=--experimental-specifier-resolution=node NODE_NO_WARNINGS=1 node src/index.js",
