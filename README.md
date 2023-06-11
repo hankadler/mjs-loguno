@@ -1,4 +1,4 @@
-# js-loguno
+# loguno
 
 Log beautiful messages easily.
 
